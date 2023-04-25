@@ -1,0 +1,277 @@
+---
+id: "truelayer"
+title: "TrueLayer"
+hide_title: "true"
+---
+
+![](/img/providers/logos/truelayer.png)
+
+# TrueLayer
+
+## About
+TrueLayer is a payment provider offering top-up (deposit) and payout (withdrawal and refund) between the user's bank account and merchant account(held by TrueLayer).
+
+| Provider Name                | TrueLayer                                                      |
+|------------------------------|----------------------------------------------------------------|
+| Link                         | [https://truelayer.com/en/](https://truelayer.com/en/)         |
+| Console                      | https://console.truelayer.com/auth                             |
+| Classification               | Online Bank payments                                           |
+| Regions                      | United Kingdom, Ireland, Spain, France, Netherlands, Lithuania |
+| Currencies                   | `GBP`, `EUR`                                                   |
+| Methods/PaymentTxTypes       | `BankDeposit`, `BankWithdrawal`, `Refund`                      |
+| PaymentIQ Configuration File | `TrueLayerConfig`                                              |
+
+## Configuration Information
+
+<details>
+<summary>Click to view example configuration</summary>
+<br/>
+
+```xml
+<com.devcode.paymentiq.integration.truelayer.TrueLayerConfig>
+  <enabled>true</enabled>
+  <testMode>true</testMode>
+  <container>window</container>
+  <accounts>
+    <entry>
+      <string>UK</string>
+      <account>
+        <apiKey>??</apiKey>
+        <secretKey>??</secretKey>
+        <beneficiaryName></beneficiaryName>
+        <beneficiaryAccountNumber>??</beneficiaryAccountNumber>
+        <merchantCode>??</merchantCode>
+        <siteReference></siteReference>
+        <doDefaultRedirect>false</doDefaultRedirect>
+        <supportedCurrencies>GBP</supportedCurrencies>
+        <publicKey>???</publicKey>
+        <pspPrivateKey>???</pspPrivateKey>
+        <delayInSeconds>???</delayInSeconds>
+      </account>
+    </entry>
+  </accounts>
+  <divisions></divisions>
+  <!--options
+  <retail , corporate, business>
+-->
+</com.devcode.paymentiq.integration.truelayer.TrueLayerConfig>
+```
+
+</details>
+
+### Attributes
+
+| Attribute                | Description                                                                                                                                                                                                                                                                   |
+|--------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| apiKey                   | Corresponds to `client_id` from TrueLayer console. One of the parameters used in the process of authentication                                                                                                                                                                |
+| secretKey                | Corresponds to `client_secret` from TrueLayer console. One of the parameters used in the process of authentication                                                                                                                                                            |
+| beneficiaryName.         | The name on the Merchant account.                                                                                                                                                                                                                                             |
+| siteReference            | The reference that will appear on customer bank statement, along with paymentIq txId. It must be a string with a maximum length of '8'                                                                                                                                        |
+| beneficiaryAccountNumber | The account number of merchant account(extract it from the Truelayer console).                                                                                                                                                                                                |
+| merchantCode             | The sort code of merchant account(extract it from the Truelayer console).                                                                                                                                                                                                     |
+| doDefaultRedirect        | Has boolean value.The default value is false. If set to true, the user will be returned a URI directly from the bank. It should take the value false for UK payments account and true for European payments                                                                   |
+| pspPrivateKey            | The Private key of Elliptic Curve key pair generated by the merchant (check Generate keypair part).to be used for signing requests, which you should not share with anyone outside of your organisation. used only for withdrawal and refund                                  |
+| publicKey                | The Id of the public key of Elliptic Curve key pair generated by the merchant (check Generate keypair part)to be send to TrueLayer to verify requests, used only for withdrawal and refund                                                                                    |
+| divisions                | Indicates the divisions that if the bank include, it will be displayed to the user. It can take one or more of following(retail, corporate, business), if divisions entry is not added to the config or was empty, then all the bank returned by Truelayer will be displayed. |
+| delayInSeconds           | The delay, which must be carried out at a certain stage of the payment flow. Here when PaymentIq provides the status check after callback notification.                                                                                                                       |
+
+## Truelayer API v3 Information
+
+To use Truelayer API v3, the `PSP Version` in the Routing rule should be set to `v3`. See the example below.
+
+### v3 Specific parameters
+
+| Attribute                                                       | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+|-----------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| accountConfig.accountID                                         | Truelayer merchant account ID. This parameter can be found in the merchant account section for the TureLayer console.                                                                                                                                                                                                                                                                                                                                                     |
+| accountConfig.pspPublicKey                                      | The Id of the public key of Elliptic Curve key pair generated by the merchant (check Generate keypair part) to be send to TrueLayer to verify requests.                                                                                                                                                                                                                                                                                                                   |
+| accountConfig.merchantUrl                                       | Truelayer Verification Authentication URL. This parameter can be generated in the Auth Link Builder section of the TrueLayer console.                                                                                                                                                                                                                                                                                                                                     |
+| accountConfig.securityLevel                                     | Score from 0 to 100 indicating the minimum value for successful passing user account verification. Uses for withdrawals.                                                                                                                                                                                                                                                                                                                                                  |
+| accountConfig.channelId or config.channelId                     | Optional. Corresponds to the Truelayer `release_channel` payment request parameter. `release_channel` is used for filtering the list of available banks, so that the filtered banks are shown on the bank selection screen for the user when making a payment. Can be set to the values `general_availability` `public_beta` `private_beta` `alpha`. If not set, the default `general_availability` value is used.                                                        |
+| accountConfig.customerSegments or config.customerSegments       | Optional. Corresponds to the Truelayer `customer_segments` payment request parameter. `customer_segments` is used for filtering the list of available banks, so that the filtered banks are shown on the bank selection screen for the user when making a payment. If not set the default `retail` value is used. It is possible to set multiple values by using _&#124;_ (pipe character)                                                                                |
+| accountConfig.forceCountry or config.forceCountry               | Optional. Corresponds to the Truelayer `countries` payment request parameter. `countries` is used for filtering the list of available banks, so that the filtered banks of the specific countries are shown on the bank selection screen for the user when making a payment. The available countries are `GB` `IE` `FR` `ES` `NL` `LT`. It is possible to set multiple values by using _&#124;_ (pipe character)                                                          |
+| accountConfig.excludedProviderIds or config.excludedProviderIds | Optional. Corresponds to the Truelayer `provider_ids` payment request parameter. `provider_ids` is used for filtering the list of available banks, so that the filtered banks are shown on the bank selection screen for the user when making a payment. The IDs of the specific banks that are desired to be excluded from the list should be provided here. It is possible to set multiple values by using _&#124;_ (pipe character)                                    |
+| accountConfig.useVerification                                   | Optional. If true, it enables the deposit option with bank account verification. The verification happens only for first-time deposits. If the verification is passed, the deposit is initiated with the obtained details and the bank details are stored.                                                                                                                                                                                                                |
+| config.creditOnExecuted                                         | Optional. If true, it enables for EUR deposits the possibility of top-up when the first notification is received (which is of type `payment_executed`). It depends on the value of the `settlement_risk.category` parameter in the webhook. When the value is `low_risk`, top-up will happen immediately, otherwise, if `high_risk`, it will happen after the notification of type `payment_settled` is received. This setting does not affect payments with GBP currency. |
+| config.brandName                                                | Mandatory. This is the brand name of the merchant and it will be sent with the payload of each payment as text, after the internal PaymentIQ transaction id. e.g. 1234567890 - Brand name                                                                                                                                                                                                                                                                                 |
+| config.sandboxMode                                              | Optional. This is needed only for testing, not in production. If true, it enables using the proper mock `provider_id` under the hood, to be able to get the right `scheme_id`, to simulate and test the verification and deposit flow (which is possible in sandbox mode only for GBP currency).                                                                                                                                                                          |
+<details>
+<summary>Click to view example configuration</summary>
+<br/>
+
+```xml
+<com.devcode.paymentiq.integration.truelayer.TrueLayerConfig>
+  <enabled>true</enabled>
+  <testMode>true</testMode>
+  <accounts>
+    <entry>
+      <string>EUR</string>
+      <account>
+        <apiKey>??</apiKey>
+        <secretKey>??</secretKey>
+        <beneficiaryName>Jonah Jameson</beneficiaryName>
+        <supportedCurrencies>EUR</supportedCurrencies>
+        <merchantUrl>??</merchantUrl>
+        <securityLevel>??</securityLevel>
+        <pspPublicKey>???</pspPublicKey>
+        <pspPrivateKey>???</pspPrivateKey>
+        <accountID>???</accountID>
+        <channelId>private_beta</channelId>
+        <excludedProviderIds>someprovider1|provider5</excludedProviderIds>
+        <customerSegments>retail</customerSegments>
+        <forceCountry>IE</forceCountry>
+        <useVerification>???</useVerification>
+      </account>
+    </entry>
+  </accounts>
+  <creditOnExecuted>???</creditOnExecuted>
+  <brandName>???</brandName>
+  <sandboxMode>???</sandboxMode>
+</com.devcode.paymentiq.integration.truelayer.TrueLayerConfig>
+```
+
+</details>
+
+### Merchant account details
+
+Merchant account details can be found in the Truelayer merchant account section of the console [https://console.truelayer.com/payments/v3/merchant-account](https://console.truelayer.com/payments/v3/merchant-account).
+
+![](/img/providers/truelayer-account-details.png)
+
+### Verification Authentication URL
+
+To generate Authentication URL goto DATA API > Auth Link Builder of the TrueLayer console:
+1. Select needed providers under Providers tab.
+2. Select only `verification` under Permissions tab.
+3. Select V3 Redirect URL under Redirect URLs tab. (add the [Redirect URI](#redirect-uri) to the allowed redirect URIs under Settings > App Settings of the TrueLayer console.)
+
+![](/img/providers/truelayer-auth-link.png)
+
+NOTE: To be able to save the Authentication URL in configuration the URL should be encoded. To do this you can use any online encoders, e.g. [urlencoder.org](https://www.urlencoder.org/)
+
+### Webhook for V3
+
+Webhook should be set in the merchant's account in the Truelayer console. The information on how to do it can be found [here](https://docs.truelayer.com/docs/set-up-truelayer-console-for-payments-v3). The appropriate webhooks can be found in the Webhook URL section below.
+
+## Example Routing Rules
+
+### V1
+
+![](/img/providers/routing/truelayer.png)
+
+### V3
+
+![](/img/providers/routing/truelayer_v3.png)
+
+## Generate Elliptic Curve key pair
+
+In order to successfully make a payout. You need to Generate Elliptic Curve key pair:
+
+1. A public key that the merchant needs to upload in the Payouts Settings page in TrueLayer Console.
+2. A private key that needs to be copied (open the file and copy the text) and pasted as a value to `pspPrivateKey` parameter in the TrueLayerConfig. This key should not be shared with anyone outside of your organisation.
+
+- How to Generate:
+  1.  To generate the private key, run the following in cmd/terminal: `openssl ecparam -genkey -name secp521r1 -noout -out ec512-private-key.pem`
+  2.  To obtain the public key, run the following in cmd/terminal:`openssl ec -in ec512-private-key.pem -pubout -out ec512-public-key.pem`. "ec512-public-key.pem" is the file you should upload in the Payouts Settings page in TrueLayer Console.
+  3.  You can inspect the generated public key by running the following in cmd/terminal: `openssl ec -inform PEM -pubin -in ec512-public-key.pem -text -noout`
+  4.  You can inspect the generated private key by running the following in cmd/terminal: `openssl ec -inform PEM -in ec512-private-key.pem -text -noout`
+
+## Sign up for TrueLayer console
+
+The merchant needs to sign up for TrueLayer console [https://console.truelayer.com/auth](https://console.truelayer.com/auth) and obtain `client_id` and `client_secret` for the environment the merchant is using (Live or Sandbox), and set them as values to the parameters apiKey and secretKey respectively in TrueLayerConfig.
+
+![](/img/providers/truelayer-credentials.png)
+
+Add the [Redirect URI](#redirect-uri) to the allowed redirect URIs under Settings > App Settings of the TrueLayer console.
+
+![](/img/providers/truelayer-redirect-uri.png)
+
+Then add the appropriate [Webhook URL](#webhook-url) to the Webhook URI under Payments > Settings of the TrueLayer console.
+
+![](/img/providers/truelayer-webhooks-v2.png)
+
+Activate Payments by navigating to Payments, then click Get Started. You will be asked to:
+
+- Upload your public signing key (.PEM file).
+- Name your merchant account.
+- The public key which the merchant has generated previously.
+
+Following the steps above will give you instant access to Truelayer's sandbox environment.
+
+## Getting a live merchant account
+
+After signing up for TrueLayer console you need to send your `client_id` to TrueLayer team to get a live merchant account created for you.
+
+- The account details (IBAN, account number, sortcode) and balance of your merchant account can be found on the console.
+- In order to top-up your merchant account as a merchant, you can make a normal bank transfer to your merchant account using the account details in the Truelayer console, and to make a payout from your merchant accountt to your bank account you need to contact yout account executive at Truelayer an request them to enable automatic account sweeping.
+
+## Customising Truelayer's hosted payment page
+
+The hosted payment page collects all payment information required from your users and guides them through the payment authorisation journey. Any new banks supported by Truelayer will be added to the hosted payment page without any updates needed from your side.
+
+![](/img/providers/truelayer-hpp.png)
+
+The hosted payment page includes:
+
+      - A bank selection screen
+      - A consent screen
+      - A QR code that allows desktop users to continue the payment on their mobile phone
+      - Redirection to your user's banking website or app
+
+Hosted payment page is currently optimised for the UK, Ireland, Spain, France, the Netherlands and Lithuania, and is displayed in the major languages in those countries.
+
+You can customise the hosted payment page to match the look and feel of your brand. Go to the Payments Customisation section of our developer console to:
+
+      - Upload your merchant logo
+      - Update the application name
+      - Updating these settings will automatically be reflected on the hosted payment page
+
+![](/img/providers/truelayer-hpp-custom.png)
+
+## Redirect URI
+
+Test: https://test-api.paymentiq.io/paymentiq/api/truelayer/redirect
+
+Truelayer V3 Test: https://test-api.paymentiq.io/paymentiq/api/v3/truelayer/redirect
+
+Production: https://api.paymentiq.io/paymentiq/api/truelayer/redirect
+
+Truelayer V3 Production: https://api.paymentiq.io/paymentiq/api/v3/truelayer/redirect
+
+## Webhook URL
+
+Test: https://test-api.paymentiq.io/paymentiq/api/truelayer/callback
+
+Truelayer V3 Test: https://test-api.paymentiq.io/paymentiq/api/v3/truelayer/callback
+
+Production: https://api.paymentiq.io/paymentiq/api/truelayer/callback
+
+Truelayer V3 Production: https://api.paymentiq.io/paymentiq/api/v3/truelayer/callback
+
+## Test Information
+
+### Deposit
+
+After initiating a deposit transaction the end-user will be redirected to a page with a list of available banks to select a specific bank. After selecting a bank, the end-user will be redirected to the bank page in order to authenticate the payment.
+
+| customer number | pin and password                          |
+|-----------------|-------------------------------------------|
+| 123456789012    | enter the provided hints above the boxes. |
+
+### Verification & Deposit (V3)
+With the V3 version of TrueLayer API, if the verification is enabled for the PSP account in use, for first-time deposits, the end-user will go through a verification step and if the `match_score` returned by TrueLayer's API is higher than the `securityLevel` value, the verification is passed. 
+So, the account can be considered as verified and bank details can be stored.
+The payment will be initiated using the collected bank account. This is an additional deposit option, separate from the one that currently exists and can be switched on/off per PSP account.
+
+When it comes to testing this flow, at the moment, due to TrueLayer's sandbox limitations, it is only possible to test it with the GBP currency and not with EUR.
+
+
+### Withdrawal
+
+The user can only make a withdrawal from a saved account with the IBAN of bank account he/she wants to withdraw money to (which was created when he/she first made a deposit from the same bank account).
+
+### V3 Withdrawal
+
+After initiating a withdrawal transaction the end-user should give a consent to access to their bank data and will be redirected to the bank page in order to authenticate.
+Then PIQ will send verification request to TrueLayer Verification API. TrueLayer will compare the identity data to the account holder's name for all the connected account(s) the user has given consent for. The result of the comparison along with its `match score` will return to PIQ.
+If received match score will be equal or greater then `security level` - PIQ will use that account details to execute withdrawal.

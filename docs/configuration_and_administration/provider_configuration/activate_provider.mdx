@@ -1,0 +1,12 @@
+---
+id: activate_provider
+title: Provider Configuration
+custom_edit_url: null
+---
+import { providerProducts } from "./../../../src/data";
+import { columns } from "./../../../src/data/activateProviderTable.js";
+import TableWrapper from "./../../../src/components/DataTable/ProviderTable/ProviderTableWrapper.js";
+
+Use the filter below to find the payment provider you want to activate on your account, then click on it to see instructions and options.
+
+<TableWrapper filter={true} columns={columns} data={providerProducts} />

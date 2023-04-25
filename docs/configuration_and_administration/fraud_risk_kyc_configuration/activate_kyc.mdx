@@ -1,0 +1,22 @@
+---
+id: activate_kyc
+title: KYC Configuration
+custom_edit_url: null
+---
+import { providers } from "./../../../src/data";
+import { columns } from "./../../../src/data/kycTable.js";
+import TableWrapper from "./../../../src/components/DataTable/ProviderTable/ProviderTableWrapper.js";
+
+Use the filter below to find the KYC provider you want to activate on your account, then click on it to see instructions and options.
+
+<TableWrapper columns={columns} data={providers} />
+
+<br/>
+
+- **1-Click:** Connects to several identity providers through our specialized API.
+- **KYC:** These providers are used to check the customers age and ID status.
+- **Anti-Fraud:** These providers are specifically used to prevent fraud.
+- **AML:** These providers are used to check pep/sanction/adversed media.
+- **Affordability:** These providers are used to check players source of funds and affordability score
+- **Digital ID:** With these providers players can prove their identity online in a simple and smooth way.
+- **eIDV:** These providers are used to check customers age, ID and address in government, credit, telco etc data sources
